@@ -252,7 +252,7 @@
             $this->mes = $mes;
         }
 
-        public function mayorMenorEdad()
+        public function mesSeleccionado()
         {
             switch ($this->mes) {
                 case 1:
@@ -279,7 +279,7 @@
     }
 
     $switch = new funcionSwitch(2);
-    echo $switch->mayorMenorEdad() . "<br><br>";
+    echo $switch->mesSeleccionado() . "<br><br>";
 
 
     //-----------------Ciclos-----------------
