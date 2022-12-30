@@ -8,6 +8,6 @@
 </head>
 <body>
     <h3>30 de diciembre del 2022</h3>
-    <h1>SINTAXIS EN PHP Y SINYAXIS DE CLASES</h1>
+    <h1>SINTAXIS EN PHP Y SINTAXIS DE CLASES</h1>
 </body>
 </html>
