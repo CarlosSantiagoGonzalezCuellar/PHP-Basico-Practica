@@ -51,8 +51,19 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     echo json_encode($datosArray);
 
 }elseif ($_SERVER["REQUEST_METHOD"] == "DELETE"){
-    //Recibe datos enviados 
-    $postBody = file_get_contents("php://input");
+    $headers = getallheaders();
+    if (isset($headers["token"]) && isset($headers["pacienteId"])) {
+        //Recibe datos enviados 
+        $send = [
+            "token" => $headers["token"],
+            "pacienteId" => $headers["pacienteId"]
+        ];
+        $postBody = json_encode($send);
+    }else {
+        //Recibe datos enviados 
+        $postBody = file_get_contents("php://input");
+    }
+
     //Envia datos al manejador
     $datosArray = $_pacientes->delete($postBody);
     //Devuelve respuesta

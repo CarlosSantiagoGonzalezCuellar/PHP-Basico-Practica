@@ -52,7 +52,4 @@ class respuestas{
         );
         return $this->response;
     }
-    
-    
-
 }
