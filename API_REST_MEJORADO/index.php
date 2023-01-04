@@ -1,3 +1,9 @@
+<?php
+require_once "./Clases/Conexion/conexion.php";
+$conexion = new conexionBd;
+print_r($conexion);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
