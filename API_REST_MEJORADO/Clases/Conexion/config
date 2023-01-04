@@ -3,6 +3,7 @@
         "server" : "localhost",
         "user" : "root",
         "password" : "",
-        "database" : "apirest"
+        "database" : "apirest",
+        "port" : "33065"
     }
 }

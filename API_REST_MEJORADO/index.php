@@ -1,7 +1,8 @@
 <?php
-require_once "./Clases/Conexion/conexion.php";
+/*require_once "./Clases/Conexion/conexion.php";
 $conexion = new conexionBd;
-print_r($conexion);
+$query = "INSERT INTO pacientes (DNI) VALUE ('456')";
+print_r($conexion->nonQueryId($query));*/
 ?>
 
 <!DOCTYPE html>
