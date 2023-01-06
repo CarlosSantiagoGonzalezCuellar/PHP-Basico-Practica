@@ -1,6 +1,6 @@
 <?php
 
-class conexionBd
+class conexionBd extends PDO
 {
     private $server;
     private $user;
@@ -21,7 +21,7 @@ class conexionBd
         }
 
         try {
-            $this->conexion = new PDO(
+            parent::__construct(
                 "mysql:host={$this->server};dbname={$this->database};port={$this->port}",
                 $this->user,
                 $this->password
@@ -63,7 +63,7 @@ class conexionBd
         return $this->convertirUtf8($resultArray);
     }
 
-    public function nonQuery($sqlStr)
+    /*public function nonQuery($sqlStr)
     {
         $resultados = $this->conexion->exec($sqlStr);
         return $resultados;
@@ -79,7 +79,7 @@ class conexionBd
         } else {
             return 0;
         }
-    }
+    }*/
 
     //ENCRIPTAR
     protected function encriptar($string){

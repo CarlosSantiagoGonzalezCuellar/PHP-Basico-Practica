@@ -50,7 +50,11 @@ class auth extends conexionBd
 
     private function obtenerDatosUsuario($correo)
     {
-        $query = "SELECT UsuarioId, Password, Estado FROM usuarios WHERE Usuario = '$correo'";
+        $_pdo = new conexionBd;
+        $query = "SELECT UsuarioId, Password, Estado FROM usuarios WHERE Usuario = :correo";
+        $stmt = $_pdo->prepare($query);
+        $stmt->bindValue(':correo', $correo);
+        $stmt->execute();
         $datos = parent::obtenerDatos($query);
         if (isset($datos[0]["UsuarioId"])) {
             return $datos;
@@ -61,12 +65,16 @@ class auth extends conexionBd
 
     private function insertarToken($usuarioId)
     {
+        $_pdo = new conexionBd;
         $val = true;
         $token = bin2hex(openssl_random_pseudo_bytes(16, $val));
         $fecha = date("Y-m-d H:i");
         $estado = "Activo";
-        $query = "INSERT INTO usuarios_token (UsuarioId, Token, Estado, Fecha) VALUES ('$usuarioId', '$token', '$estado', '$fecha')";
-        $verifica = parent::nonQuery($query);
+        $sql = "INSERT INTO usuarios_token (UsuarioId, Token, Estado, Fecha) VALUES (':usuarioId', '$token', '$estado', '$fecha')";
+        $stmt = $_pdo->prepare($sql);
+        $stmt->bindValue(':usuarioId', $usuarioId);
+        $stmt->execute();
+        $verifica = exec($stmt);
 
         if ($verifica) {
             return $token;
