@@ -42,7 +42,7 @@ class conexionBd extends PDO
         return json_decode($jsonData, true);
     }
 
-    private function convertirUtf8($array)
+    public function convertirUtf8($array)
     {
         array_walk_recursive($array, function (&$item, $key) {
             if (!mb_detect_encoding($item, "utf-8", true)) {

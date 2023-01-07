@@ -1,8 +1,10 @@
 <?php
 require_once "./Clases/authClase.php";
+require_once "./Clases/Conexion/conexion.php";
 require_once "./Clases/respuestas.php";
 
 $_auth = new auth;
+$_pdo = new conexionBd;
 $_respuestas = new respuestas;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -20,8 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     echo json_encode($datosArray);
 
-    //PARA UTILIZAR CON HEADER
-    /*$headers = getallheaders();
+    /*//PARA UTILIZAR CON HEADER
+    $headers = getallheaders();
     if (isset($headers["usuario"]) && isset($headers["password"])) {
         //Recibe datos enviados 
         $send = [

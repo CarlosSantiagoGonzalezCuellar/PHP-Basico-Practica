@@ -48,14 +48,28 @@ class auth extends conexionBd
         }
     }
 
-    private function obtenerDatosUsuario($correo)
+    public function obtenerDatosUsuario($correo)
     {
         $_pdo = new conexionBd;
-        $query = "SELECT UsuarioId, Password, Estado FROM usuarios WHERE Usuario = :correo";
-        $stmt = $_pdo->prepare($query);
-        $stmt->bindValue(':correo', $correo);
-        $stmt->execute();
-        $datos = parent::obtenerDatos($query);
+        /*$pass = parent::encriptar($pass);
+        $sql = $_pdo->prepare("SELECT * FROM usuarios WHERE Usuario = :usuario AND Password = :password");
+        $sql->bindValue(':usuario', $user);
+        $sql->bindValue(':password', $pass);
+        $sql->execute();
+        $sql->setFetchMode(PDO::FETCH_ASSOC);
+        $datos = json_encode($sql->fetchAll());
+        if ($datos != []) {
+            return $datos;
+        }else {
+            return "No se rinda";
+        }*/
+
+        $sql = $_pdo->prepare("SELECT * FROM usuarios WHERE Usuario = :correo");
+        $sql->bindValue(':correo', $correo);
+        $sql->execute();
+        $sql->setFetchMode(PDO::FETCH_ASSOC);
+        $datos = json_encode($sql->fetchAll());
+
         if (isset($datos[0]["UsuarioId"])) {
             return $datos;
         } else {
@@ -70,9 +84,12 @@ class auth extends conexionBd
         $token = bin2hex(openssl_random_pseudo_bytes(16, $val));
         $fecha = date("Y-m-d H:i");
         $estado = "Activo";
-        $sql = "INSERT INTO usuarios_token (UsuarioId, Token, Estado, Fecha) VALUES (':usuarioId', '$token', '$estado', '$fecha')";
+        $sql = "INSERT INTO usuarios_token (UsuarioId, Token, Estado, Fecha) VALUES (':usuarioId', ':token', ':estado', ':fecha')";
         $stmt = $_pdo->prepare($sql);
         $stmt->bindValue(':usuarioId', $usuarioId);
+        $stmt->bindValue(':token', $token);
+        $stmt->bindValue(':estado', $estado);
+        $stmt->bindValue(':fecha', $fecha);
         $stmt->execute();
         $verifica = exec($stmt);
 

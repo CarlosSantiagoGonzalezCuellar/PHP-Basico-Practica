@@ -18,13 +18,7 @@ class pacientes extends conexionBd
     private $token = "";
     private $imagen = "";
 
-    /*
-    public function obtenerPaciente($id)
-    {
-        $query = "SELECT * FROM " . $this->table . " WHERE PacienteId = '$id'";
-        return parent::obtenerDatos($query);
-    }
-
+/*
     public function post($json)
     {
         $_respuestas = new respuestas;
@@ -221,21 +215,19 @@ class pacientes extends conexionBd
 
     private function buscarToken()
     {
-        $query = "SELECT TokenId, UsuarioId, Estado FROM usuarios_token WHERE Token = '" . $this->token . "' AND Estado = 'Activo'";
-        $resp = parent::obtenerDatos($query);
-        if ($resp) {
-            return $resp;
-        } else {
-            return 0;
-        }
-    }
+        $_pdo = new conexionBd;
+        $sql = $_pdo->prepare("SELECT TokenId, UsuarioId, Estado FROM usuarios_token WHERE Token = :token AND Estado = 'Activo'");
+        $sql->bindValue(':token', $this->token);
+        $sql->execute();
+        $sql->setFetchMode(PDO::FETCH_ASSOC);
+        $datos = $sql->fetchAll();
+        $resultArray = array();
 
-    private function actualizarToken($tokenId)
-    {
-        $date = date("Y-m-d H:i");
-        $query = "SELECT usuarios_token SET Fecha = '$date' WHERE TokenId = '$tokenId'";
-        $resp = parent::nonQuery($query);
-        if ($resp >= 1) {
+        foreach ($datos as $key) {
+            $resultArray[] = $key;
+        }
+        $resp = $this->convertirUtf8($resultArray);
+        if ($resp) {
             return $resp;
         } else {
             return 0;
