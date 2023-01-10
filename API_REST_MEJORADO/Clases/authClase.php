@@ -68,10 +68,17 @@ class auth extends conexionBd
         $sql->bindValue(':correo', $correo);
         $sql->execute();
         $sql->setFetchMode(PDO::FETCH_ASSOC);
-        $datos = json_encode($sql->fetchAll());
+        $sql = $sql->fetchAll();
+        $datos = $sql;
+        $resultArray = array();
 
-        if (isset($datos[0]["UsuarioId"])) {
-            return $datos;
+        foreach ($datos as $key) {
+            $resultArray[] = $key;
+        }
+
+        $resp = $this->convertirUtf8($resultArray);
+        if (isset($resp[0]["UsuarioId"])) {
+            return $resp;
         } else {
             return 0;
         }
@@ -84,14 +91,13 @@ class auth extends conexionBd
         $token = bin2hex(openssl_random_pseudo_bytes(16, $val));
         $fecha = date("Y-m-d H:i");
         $estado = "Activo";
-        $sql = "INSERT INTO usuarios_token (UsuarioId, Token, Estado, Fecha) VALUES (':usuarioId', ':token', ':estado', ':fecha')";
-        $stmt = $_pdo->prepare($sql);
-        $stmt->bindValue(':usuarioId', $usuarioId);
-        $stmt->bindValue(':token', $token);
-        $stmt->bindValue(':estado', $estado);
-        $stmt->bindValue(':fecha', $fecha);
-        $stmt->execute();
-        $verifica = exec($stmt);
+        $sql = $_pdo->prepare("INSERT INTO usuarios_token (UsuarioId, Token, Estado, Fecha) VALUES (':usuarioId', ':token', ':estado', ':fecha')");
+        $sql->bindValue(':usuarioId', $usuarioId);
+        $sql->bindValue(':token', $token);
+        $sql->bindValue(':estado', $estado);
+        $sql->bindValue(':fecha', $fecha);
+        $sql->execute();
+        $verifica = $sql;
 
         if ($verifica) {
             return $token;

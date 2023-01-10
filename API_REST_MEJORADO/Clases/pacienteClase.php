@@ -18,58 +18,97 @@ class pacientes extends conexionBd
     private $token = "";
     private $imagen = "";
 
-/*
+    public function listaPacientes($pagina = 1)
+    {
+        $_pdo = new conexionBd;
+        $inicio = 0;
+        $cantidad = 100;
+        if ($pagina > 1) {
+            $inicio = ($cantidad * ($pagina - 1)) + 1;
+            $cantidad = $cantidad * $pagina;
+        }
+
+        $sql = $_pdo->prepare("SELECT * FROM pacientes LIMIT $inicio, $cantidad");
+        $sql->execute();
+        $sql->setFetchMode(PDO::FETCH_ASSOC);
+        $datos = $sql->fetchAll();
+        $resultArray = array();
+
+        foreach ($datos as $key) {
+            $resultArray[] = $key;
+        }
+        $resp = $this->convertirUtf8($resultArray);
+        return $resp;
+    }
+
+    public function obtenerPaciente($id)
+    {
+        $_pdo = new conexionBd;
+        $sql = $_pdo->prepare("SELECT * FROM pacientes WHERE pacienteId=:id");
+        $sql->bindValue(':id', $id);
+        $sql->execute();
+        $sql->setFetchMode(PDO::FETCH_ASSOC);
+        $datos = $sql->fetchAll();
+        $resultArray = array();
+
+        foreach ($datos as $key) {
+            $resultArray[] = $key;
+        }
+        $resp = $this->convertirUtf8($resultArray);
+        return $resp;
+    }
+
     public function post($json)
     {
         $_respuestas = new respuestas;
         $datos = json_decode($json, true);
 
-        if (!isset($datos["token"])) {
+        /*if (!isset($datos["token"])) {
             return $_respuestas->error_401();
         } else {
             $this->token = $datos["token"];
             $arrayToken = $this->buscarToken();
-            if ($arrayToken) {
-                if (!isset($datos["nombre"]) || !isset($datos["dni"]) || !isset($datos["correo"])) {
-                    return $_respuestas->error_400();
-                } else {
-                    $this->nombre = $datos["nombre"];
-                    $this->dni = $datos["dni"];
-                    $this->correo = $datos["correo"];
-                    if (isset($datos["telefono"])) {
-                        $this->telefono = $datos["telefono"];
-                    }
-                    if (isset($datos["direccion"])) {
-                        $this->direccion = $datos["direccion"];
-                    }
-                    if (isset($datos["codigoPostal"])) {
-                        $this->codigoPostal = $datos["codigoPostal"];
-                    }
-                    if (isset($datos["genero"])) {
-                        $this->genero = $datos["genero"];
-                    }
-                    if (isset($datos["fechaNacimiento"])) {
-                        $this->fechaNacimiento = $datos["fechaNacimiento"];
-                    }
-                    if (isset($datos["imagen"])) {
-                        $resp = $this->procesarImagen($datos["imagen"]);
-                        $this->imagen = $resp;
-                    }
-                    $resp = $this->insertarPaciente();
-                    if ($resp) {
-                        $respuesta = $_respuestas->response;
-                        $respuesta["result"] = array(
-                            "pacienteId" => $resp
-                        );
-                        return $respuesta;
-                    } else {
-                        return $_respuestas->error_500();
-                    }
-                }
+            if ($arrayToken) {*/
+        if (!isset($datos["nombre"]) || !isset($datos["dni"]) || !isset($datos["correo"])) {
+            return $_respuestas->error_400();
+        } else {
+            $this->nombre = $datos["nombre"];
+            $this->dni = $datos["dni"];
+            $this->correo = $datos["correo"];
+            if (isset($datos["telefono"])) {
+                $this->telefono = $datos["telefono"];
+            }
+            if (isset($datos["direccion"])) {
+                $this->direccion = $datos["direccion"];
+            }
+            if (isset($datos["codigoPostal"])) {
+                $this->codigoPostal = $datos["codigoPostal"];
+            }
+            if (isset($datos["genero"])) {
+                $this->genero = $datos["genero"];
+            }
+            if (isset($datos["fechaNacimiento"])) {
+                $this->fechaNacimiento = $datos["fechaNacimiento"];
+            }
+            if (isset($datos["imagen"])) {
+                $resp = $this->procesarImagen($datos["imagen"]);
+                $this->imagen = $resp;
+            }
+            $resp = $this->insertarPaciente();
+            if ($resp) {
+                $respuesta = $_respuestas->response;
+                $respuesta["result"] = array(
+                    "pacienteId" => $resp
+                );
+                return $respuesta;
             } else {
-                return $_respuestas->error_401("El token enviado es invalido o ha caducado!!");
+                return $_respuestas->error_500();
             }
         }
+        /*} else {
+                return $_respuestas->error_401("El token enviado es invalido o ha caducado!!");
+            }
+        }*/
     }
 
     private function procesarImagen($img)
@@ -87,10 +126,26 @@ class pacientes extends conexionBd
 
     private function insertarPaciente()
     {
-        $query = "INSERT INTO " . $this->table . " (DNI, Nombre, Direccion, CodigoPostal, Telefono, Genero, FechaNacimiento, Correo, Imagen) 
-        VALUES ('" . $this->dni . "', '" . $this->nombre . "', '" . $this->direccion . "', '" . $this->codigoPostal . "', '" . $this->telefono .
-            "', '" . $this->genero . "', '" . $this->fechaNacimiento . "', '" . $this->correo . "', '" . $this->imagen . "')";
-        $resp = parent::nonQueryId($query);
+        $_pdo = new conexionBd;
+        $sql = $_pdo->prepare("INSERT INTO pacientes (DNI, Nombre, Direccion, CodigoPostal, Telefono, Genero, FechaNacimiento, Correo, Imagen) 
+        VALUES (:dni, :nombre, :direccion, :codigoPostal, :telefono, :genero, :fechaNacimiento, :correo, :imagen)");
+        $sql->bindValue(':dni', $this->dni);
+        $sql->bindValue(':nombre', $this->nombre);
+        $sql->bindValue(':direccion', $this->direccion);
+        $sql->bindValue(':codigoPostal', $this->codigoPostal);
+        $sql->bindValue(':telefono', $this->telefono);
+        $sql->bindValue(':genero', $this->genero);
+        $sql->bindValue(':fechaNacimiento', $this->fechaNacimiento);
+        $sql->bindValue(':correo', $this->correo);
+        $sql->bindValue(':imagen', $this->imagen);
+        $sql->execute();
+        $respuesta = $sql;
+        if ($respuesta == true) {
+            $resp = $_pdo->lastInsertId();
+        } else {
+            $resp = 0;
+        }
+
         if ($resp) {
             return $resp;
         } else {
@@ -103,65 +158,77 @@ class pacientes extends conexionBd
         $_respuestas = new respuestas;
         $datos = json_decode($json, true);
 
-        if (!isset($datos["token"])) {
+        /*if (!isset($datos["token"])) {
             return $_respuestas->error_401();
         } else {
             $this->token = $datos["token"];
             $arrayToken = $this->buscarToken();
-            if ($arrayToken) {
-                if (!isset($datos["pacienteId"])) {
-                    return $_respuestas->error_400();
-                } else {
-                    $this->pacienteId = $datos["pacienteId"];
-                    if (isset($datos["nombre"])) {
-                        $this->nombre = $datos["nombre"];
-                    }
-                    if (isset($datos["dni"])) {
-                        $this->dni = $datos["dni"];
-                    }
-                    if (isset($datos["correo"])) {
-                        $this->correo = $datos["correo"];
-                    }
-                    if (isset($datos["telefono"])) {
-                        $this->telefono = $datos["telefono"];
-                    }
-                    if (isset($datos["direccion"])) {
-                        $this->direccion = $datos["direccion"];
-                    }
-                    if (isset($datos["codigoPostal"])) {
-                        $this->codigoPostal = $datos["codigoPostal"];
-                    }
-                    if (isset($datos["genero"])) {
-                        $this->genero = $datos["genero"];
-                    }
-                    if (isset($datos["fechaNacimiento"])) {
-                        $this->fechaNacimiento = $datos["fechaNacimiento"];
-                    }
-                    $resp = $this->modificarPaciente();
-                    if ($resp) {
-                        $respuesta = $_respuestas->response;
-                        $respuesta["result"] = array(
-                            "pacienteId" => $this->pacienteId
-                        );
-                        return $respuesta;
-                    } else {
-                        return $_respuestas->error_500();
-                    }
-                }
+            if ($arrayToken) {*/
+        if (!isset($datos["pacienteId"])) {
+            return $_respuestas->error_400();
+        } else {
+            $this->pacienteId = $datos["pacienteId"];
+            if (isset($datos["nombre"])) {
+                $this->nombre = $datos["nombre"];
+            }
+            if (isset($datos["dni"])) {
+                $this->dni = $datos["dni"];
+            }
+            if (isset($datos["correo"])) {
+                $this->correo = $datos["correo"];
+            }
+            if (isset($datos["telefono"])) {
+                $this->telefono = $datos["telefono"];
+            }
+            if (isset($datos["direccion"])) {
+                $this->direccion = $datos["direccion"];
+            }
+            if (isset($datos["codigoPostal"])) {
+                $this->codigoPostal = $datos["codigoPostal"];
+            }
+            if (isset($datos["genero"])) {
+                $this->genero = $datos["genero"];
+            }
+            if (isset($datos["fechaNacimiento"])) {
+                $this->fechaNacimiento = $datos["fechaNacimiento"];
+            }
+            $resp = $this->modificarPaciente();
+            if ($resp) {
+                $respuesta = $_respuestas->response;
+                $respuesta["result"] = array(
+                    "pacienteId" => $this->pacienteId
+                );
+                return $respuesta;
             } else {
-                return $_respuestas->error_401("El token enviado es invalido o ha caducado!!");
+                return $_respuestas->error_500();
             }
         }
+        /*} else {
+                return $_respuestas->error_401("El token enviado es invalido o ha caducado!!");
+            }
+        }*/
     }
 
     private function modificarPaciente()
     {
-        $query = "UPDATE " . $this->table . " SET Nombre = '" . $this->nombre . "', Direccion = '" . $this->direccion . "', DNI = '" . $this->dni . "', CodigoPostal = '" . $this->codigoPostal .
-            "', Telefono = '" . $this->telefono . "', Genero = '" . $this->genero . "', FechaNacimiento = '" . $this->fechaNacimiento . "', Correo = '" . $this->correo . "' 
-        WHERE PacienteId = '" . $this->pacienteId . "'";
+        $_pdo = new conexionBd;
+        $sql = $_pdo->prepare("UPDATE pacientes SET DNI=:dni, Nombre=:nombre, Direccion=:direccion, CodigoPostal=:codigoPostal, 
+        Telefono=:telefono, Genero=:genero, FechaNacimiento=:fechaNacimiento, Correo=:correo, Imagen=:imagen 
+        WHERE PacienteId=:id");
+        $sql->bindValue(':dni', $this->dni);
+        $sql->bindValue(':nombre', $this->nombre);
+        $sql->bindValue(':direccion', $this->direccion);
+        $sql->bindValue(':codigoPostal', $this->codigoPostal);
+        $sql->bindValue(':telefono', $this->telefono);
+        $sql->bindValue(':genero', $this->genero);
+        $sql->bindValue(':fechaNacimiento', $this->fechaNacimiento);
+        $sql->bindValue(':correo', $this->correo);
+        $sql->bindValue(':imagen', $this->imagen);
+        $sql->bindValue(':id', $this->pacienteId);
+        $sql->execute();
 
-        $resp = parent::nonQuery($query);
-        if ($resp >= 1) {
+        $resp = $sql;
+        if ($resp == true) {
             return $resp;
         } else {
             return 0;
@@ -173,45 +240,48 @@ class pacientes extends conexionBd
         $_respuestas = new respuestas;
         $datos = json_decode($json, true);
 
-        if (!isset($datos["token"])) {
+        /*if (!isset($datos["token"])) {
             return $_respuestas->error_401();
         } else {
             $this->token = $datos["token"];
             $arrayToken = $this->buscarToken();
-            if ($arrayToken) {
-                if (!isset($datos["pacienteId"])) {
-                    return $_respuestas->error_400();
-                } else {
-                    $this->pacienteId = $datos["pacienteId"];
+            if ($arrayToken) {*/
+        if (!isset($datos["pacienteId"])) {
+            return $_respuestas->error_400();
+        } else {
+            $this->pacienteId = $datos["pacienteId"];
 
-                    $resp = $this->eliminarPaciente();
-                    if ($resp) {
-                        $respuesta = $_respuestas->response;
-                        $respuesta["result"] = array(
-                            "pacienteId" => $this->pacienteId
-                        );
-                        return $respuesta;
-                    } else {
-                        return $_respuestas->error_500();
-                    }
-                }
+            $resp = $this->eliminarPaciente();
+            if ($resp) {
+                $respuesta = $_respuestas->response;
+                $respuesta["result"] = array(
+                    "pacienteId" => $this->pacienteId
+                );
+                return $respuesta;
             } else {
-                return $_respuestas->error_401("El token enviado es invalido o ha caducado!!");
+                return $_respuestas->error_500();
             }
         }
+        /*} else {
+                return $_respuestas->error_401("El token enviado es invalido o ha caducado!!");
+            }
+        }*/
     }
 
     private function eliminarPaciente()
     {
-        $query = "DELETE FROM " . $this->table . " WHERE PacienteId = '" . $this->pacienteId . "'";
+        $_pdo = new conexionBd;
+        $sql = $_pdo->prepare("DELETE FROM pacientes WHERE PacienteId=:id");
+        $sql->bindValue(':id', $this->pacienteId);
+        $sql->execute();
 
-        $resp = parent::nonQuery($query);
-        if ($resp >= 1) {
+        $resp = $sql;
+        if ($resp == true) {
             return $resp;
         } else {
             return 0;
         }
-    }*/
+    }
 
     private function buscarToken()
     {

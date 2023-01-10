@@ -1,13 +1,14 @@
 <?php
 include "Clases/Conexion/conexion.php";
 require_once "Clases/respuestas.php";
-//require_once "Clases/pacienteClase.php";
+require_once "Clases/pacienteClase.php";
+
 $_pdo = new conexionBd();
 $_respuestas = new respuestas;
-//$_pacientes = new pacientes;
+$_pacientes = new pacientes;
 
 //Listar registros y consultar registro de pacientes
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+/*if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     if (isset($_GET['id'])) {
         $sql = $_pdo->prepare("SELECT * FROM pacientes WHERE pacienteId=:id");
         $sql->bindValue(':id', $_GET['id']);
@@ -88,9 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     header("Content-Type: application/json");
     $datosArray = $_respuestas->error_405();
     echo json_encode($datosArray);
-}
+}*/
 
-/*
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     if (isset($_GET["page"])) {
@@ -135,6 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     }
     echo json_encode($datosArray);
 } elseif ($_SERVER["REQUEST_METHOD"] == "DELETE") {
+    /*//PARA EJECUTAR CON EL HEADER
     $headers = getallheaders();
     if (isset($headers["token"]) && isset($headers["pacienteId"])) {
         //Recibe datos enviados 
@@ -146,8 +147,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     }else {
         //Recibe datos enviados 
         $postBody = file_get_contents("php://input");
-    }
-
+    }*/
+    $postBody = file_get_contents("php://input");
     //Envia datos al manejador
     $datosArray = $_pacientes->delete($postBody);
     //Devuelve respuesta
@@ -163,4 +164,4 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     header("Content-Type: application/json");
     $datosArray = $_respuestas->error_405();
     echo json_encode($datosArray);
-}*/
+}
