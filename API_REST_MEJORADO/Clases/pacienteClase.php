@@ -5,7 +5,6 @@ require_once "respuestas.php";
 class pacientes extends conexionBd
 {
 
-    private $table = "pacientes";
     private $pacienteId = "";
     private $dni = "";
     private $nombre = "";
@@ -18,6 +17,7 @@ class pacientes extends conexionBd
     private $token = "";
     private $imagen = "";
 
+    //<-- ========== LISTAR PACIENTES POR PAGINA DE 100 EN 100 ========== -->
     public function listaPacientes($pagina = 1)
     {
         $_pdo = new conexionBd;
@@ -41,6 +41,7 @@ class pacientes extends conexionBd
         return $resp;
     }
 
+    //<-- ========== OBTENER PACIENTE EN ESPECIFIO SEGUN SU ID ========== -->
     public function obtenerPaciente($id)
     {
         $_pdo = new conexionBd;
@@ -58,59 +59,61 @@ class pacientes extends conexionBd
         return $resp;
     }
 
+    //<-- ========== METODO POST CON VALIDACIONES ========== -->
     public function post($json)
     {
         $_respuestas = new respuestas;
         $datos = json_decode($json, true);
 
-        /*if (!isset($datos["token"])) {
+        if (!isset($datos["token"])) {
             return $_respuestas->error_401();
         } else {
             $this->token = $datos["token"];
             $arrayToken = $this->buscarToken();
-            if ($arrayToken) {*/
-        if (!isset($datos["nombre"]) || !isset($datos["dni"]) || !isset($datos["correo"])) {
-            return $_respuestas->error_400();
-        } else {
-            $this->nombre = $datos["nombre"];
-            $this->dni = $datos["dni"];
-            $this->correo = $datos["correo"];
-            if (isset($datos["telefono"])) {
-                $this->telefono = $datos["telefono"];
-            }
-            if (isset($datos["direccion"])) {
-                $this->direccion = $datos["direccion"];
-            }
-            if (isset($datos["codigoPostal"])) {
-                $this->codigoPostal = $datos["codigoPostal"];
-            }
-            if (isset($datos["genero"])) {
-                $this->genero = $datos["genero"];
-            }
-            if (isset($datos["fechaNacimiento"])) {
-                $this->fechaNacimiento = $datos["fechaNacimiento"];
-            }
-            if (isset($datos["imagen"])) {
-                $resp = $this->procesarImagen($datos["imagen"]);
-                $this->imagen = $resp;
-            }
-            $resp = $this->insertarPaciente();
-            if ($resp) {
-                $respuesta = $_respuestas->response;
-                $respuesta["result"] = array(
-                    "pacienteId" => $resp
-                );
-                return $respuesta;
+            if ($arrayToken) {
+                if (!isset($datos["nombre"]) || !isset($datos["dni"]) || !isset($datos["correo"])) {
+                    return $_respuestas->error_400();
+                } else {
+                    $this->nombre = $datos["nombre"];
+                    $this->dni = $datos["dni"];
+                    $this->correo = $datos["correo"];
+                    if (isset($datos["telefono"])) {
+                        $this->telefono = $datos["telefono"];
+                    }
+                    if (isset($datos["direccion"])) {
+                        $this->direccion = $datos["direccion"];
+                    }
+                    if (isset($datos["codigoPostal"])) {
+                        $this->codigoPostal = $datos["codigoPostal"];
+                    }
+                    if (isset($datos["genero"])) {
+                        $this->genero = $datos["genero"];
+                    }
+                    if (isset($datos["fechaNacimiento"])) {
+                        $this->fechaNacimiento = $datos["fechaNacimiento"];
+                    }
+                    if (isset($datos["imagen"])) {
+                        $resp = $this->procesarImagen($datos["imagen"]);
+                        $this->imagen = $resp;
+                    }
+                    $resp = $this->insertarPaciente();
+                    if ($resp) {
+                        $respuesta = $_respuestas->response;
+                        $respuesta["result"] = array(
+                            "pacienteId" => $resp
+                        );
+                        return $respuesta;
+                    } else {
+                        return $_respuestas->error_500();
+                    }
+                }
             } else {
-                return $_respuestas->error_500();
-            }
-        }
-        /*} else {
                 return $_respuestas->error_401("El token enviado es invalido o ha caducado!!");
             }
-        }*/
+        }
     }
 
+    //<-- ========== METODO PARA PROCESAR IMAGEN CON BASE64 ========== -->
     private function procesarImagen($img)
     {
         $direccion = dirname(__DIR__) . "\Public\Img\\";
@@ -124,6 +127,7 @@ class pacientes extends conexionBd
         return $nuevaDireccion;
     }
 
+    //<-- ========== METODO PARA AÑADIR NUEVO PACIENTE ========== -->
     private function insertarPaciente()
     {
         $_pdo = new conexionBd;
@@ -153,62 +157,64 @@ class pacientes extends conexionBd
         }
     }
 
+    //<-- ========== METODO PUT CON VALIDACIONES ========== -->
     public function put($json)
     {
         $_respuestas = new respuestas;
         $datos = json_decode($json, true);
 
-        /*if (!isset($datos["token"])) {
+        if (!isset($datos["token"])) {
             return $_respuestas->error_401();
         } else {
             $this->token = $datos["token"];
             $arrayToken = $this->buscarToken();
-            if ($arrayToken) {*/
-        if (!isset($datos["pacienteId"])) {
-            return $_respuestas->error_400();
-        } else {
-            $this->pacienteId = $datos["pacienteId"];
-            if (isset($datos["nombre"])) {
-                $this->nombre = $datos["nombre"];
-            }
-            if (isset($datos["dni"])) {
-                $this->dni = $datos["dni"];
-            }
-            if (isset($datos["correo"])) {
-                $this->correo = $datos["correo"];
-            }
-            if (isset($datos["telefono"])) {
-                $this->telefono = $datos["telefono"];
-            }
-            if (isset($datos["direccion"])) {
-                $this->direccion = $datos["direccion"];
-            }
-            if (isset($datos["codigoPostal"])) {
-                $this->codigoPostal = $datos["codigoPostal"];
-            }
-            if (isset($datos["genero"])) {
-                $this->genero = $datos["genero"];
-            }
-            if (isset($datos["fechaNacimiento"])) {
-                $this->fechaNacimiento = $datos["fechaNacimiento"];
-            }
-            $resp = $this->modificarPaciente();
-            if ($resp) {
-                $respuesta = $_respuestas->response;
-                $respuesta["result"] = array(
-                    "pacienteId" => $this->pacienteId
-                );
-                return $respuesta;
+            if ($arrayToken) {
+                if (!isset($datos["pacienteId"])) {
+                    return $_respuestas->error_400();
+                } else {
+                    $this->pacienteId = $datos["pacienteId"];
+                    if (isset($datos["nombre"])) {
+                        $this->nombre = $datos["nombre"];
+                    }
+                    if (isset($datos["dni"])) {
+                        $this->dni = $datos["dni"];
+                    }
+                    if (isset($datos["correo"])) {
+                        $this->correo = $datos["correo"];
+                    }
+                    if (isset($datos["telefono"])) {
+                        $this->telefono = $datos["telefono"];
+                    }
+                    if (isset($datos["direccion"])) {
+                        $this->direccion = $datos["direccion"];
+                    }
+                    if (isset($datos["codigoPostal"])) {
+                        $this->codigoPostal = $datos["codigoPostal"];
+                    }
+                    if (isset($datos["genero"])) {
+                        $this->genero = $datos["genero"];
+                    }
+                    if (isset($datos["fechaNacimiento"])) {
+                        $this->fechaNacimiento = $datos["fechaNacimiento"];
+                    }
+                    $resp = $this->modificarPaciente();
+                    if ($resp) {
+                        $respuesta = $_respuestas->response;
+                        $respuesta["result"] = array(
+                            "pacienteId" => $this->pacienteId
+                        );
+                        return $respuesta;
+                    } else {
+                        return $_respuestas->error_500();
+                    }
+                }
             } else {
-                return $_respuestas->error_500();
-            }
-        }
-        /*} else {
                 return $_respuestas->error_401("El token enviado es invalido o ha caducado!!");
             }
-        }*/
+        }
     }
 
+    //<-- ========== METODO PARA MODIFICAR UN PACIENTE SEGUN SU ID ========== -->
     private function modificarPaciente()
     {
         $_pdo = new conexionBd;
@@ -235,39 +241,41 @@ class pacientes extends conexionBd
         }
     }
 
+    //<-- ========== METODO DELETE CON VALIDACIONES ========== -->
     public function delete($json)
     {
         $_respuestas = new respuestas;
         $datos = json_decode($json, true);
 
-        /*if (!isset($datos["token"])) {
+        if (!isset($datos["token"])) {
             return $_respuestas->error_401();
         } else {
             $this->token = $datos["token"];
             $arrayToken = $this->buscarToken();
-            if ($arrayToken) {*/
-        if (!isset($datos["pacienteId"])) {
-            return $_respuestas->error_400();
-        } else {
-            $this->pacienteId = $datos["pacienteId"];
+            if ($arrayToken) {
+                if (!isset($datos["pacienteId"])) {
+                    return $_respuestas->error_400();
+                } else {
+                    $this->pacienteId = $datos["pacienteId"];
 
-            $resp = $this->eliminarPaciente();
-            if ($resp) {
-                $respuesta = $_respuestas->response;
-                $respuesta["result"] = array(
-                    "pacienteId" => $this->pacienteId
-                );
-                return $respuesta;
+                    $resp = $this->eliminarPaciente();
+                    if ($resp) {
+                        $respuesta = $_respuestas->response;
+                        $respuesta["result"] = array(
+                            "pacienteId" => $this->pacienteId
+                        );
+                        return $respuesta;
+                    } else {
+                        return $_respuestas->error_500();
+                    }
+                }
             } else {
-                return $_respuestas->error_500();
-            }
-        }
-        /*} else {
                 return $_respuestas->error_401("El token enviado es invalido o ha caducado!!");
             }
-        }*/
+        }
     }
 
+    //<-- ========== METODO PARA ELIMINAR UN PACIENTE SEGUN SU ID ========== -->
     private function eliminarPaciente()
     {
         $_pdo = new conexionBd;
@@ -283,6 +291,7 @@ class pacientes extends conexionBd
         }
     }
 
+    //<-- ========== METODO PARA OBTENER EL TOKEN ========== -->
     private function buscarToken()
     {
         $_pdo = new conexionBd;

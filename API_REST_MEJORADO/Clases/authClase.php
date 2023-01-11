@@ -4,6 +4,7 @@ require_once "respuestas.php";
 
 class auth extends conexionBd
 {
+    //<!-- ========== METODO DE INICIO DE SESION PARA OBTENER TOKEN DE AUTORIZACION ========== -->
     public function login($json)
     {
         $_respuestas = new respuestas;
@@ -48,28 +49,16 @@ class auth extends conexionBd
         }
     }
 
+    //<!-- ========== METODO PARA OBTENER USUARIOS CON SU CORREO Y CONTRASEÑA ========== -->
     public function obtenerDatosUsuario($correo)
     {
         $_pdo = new conexionBd;
-        /*$pass = parent::encriptar($pass);
-        $sql = $_pdo->prepare("SELECT * FROM usuarios WHERE Usuario = :usuario AND Password = :password");
-        $sql->bindValue(':usuario', $user);
-        $sql->bindValue(':password', $pass);
-        $sql->execute();
-        $sql->setFetchMode(PDO::FETCH_ASSOC);
-        $datos = json_encode($sql->fetchAll());
-        if ($datos != []) {
-            return $datos;
-        }else {
-            return "No se rinda";
-        }*/
 
         $sql = $_pdo->prepare("SELECT * FROM usuarios WHERE Usuario = :correo");
         $sql->bindValue(':correo', $correo);
         $sql->execute();
         $sql->setFetchMode(PDO::FETCH_ASSOC);
-        $sql = $sql->fetchAll();
-        $datos = $sql;
+        $datos = $sql->fetchAll();
         $resultArray = array();
 
         foreach ($datos as $key) {
@@ -84,6 +73,7 @@ class auth extends conexionBd
         }
     }
 
+    //<!-- ========== METODO PARA AGREGAR EL TOKEN CREADO ========== -->
     private function insertarToken($usuarioId)
     {
         $_pdo = new conexionBd;
@@ -91,7 +81,7 @@ class auth extends conexionBd
         $token = bin2hex(openssl_random_pseudo_bytes(16, $val));
         $fecha = date("Y-m-d H:i");
         $estado = "Activo";
-        $sql = $_pdo->prepare("INSERT INTO usuarios_token (UsuarioId, Token, Estado, Fecha) VALUES (':usuarioId', ':token', ':estado', ':fecha')");
+        $sql = $_pdo->prepare("INSERT INTO usuarios_token (UsuarioId, Token, Estado, Fecha) VALUES (:usuarioId, :token, :estado, :fecha)");
         $sql->bindValue(':usuarioId', $usuarioId);
         $sql->bindValue(':token', $token);
         $sql->bindValue(':estado', $estado);

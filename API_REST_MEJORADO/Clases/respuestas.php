@@ -8,6 +8,7 @@ class respuestas
         "result" => array()
     ];
 
+    //<!-- ========== METODO DE RESPUESTA A METODO NO PERMITIDO  ========== -->
     public function error_405()
     {
         $this->response['status'] = "error";
@@ -18,6 +19,7 @@ class respuestas
         return $this->response;
     }
 
+    //<!-- ========== METODO DE RESPUESTA A DATOS INCORRECTOS  ========== -->
     public function error_200($valor = "Datos incorrectos")
     {
         $this->response['status'] = "error";
@@ -28,6 +30,7 @@ class respuestas
         return $this->response;
     }
 
+    //<!-- ========== METODO DE RESPUESTA A DATOS INCOMPLETOS O CON MAL FORMATO  ========== -->
     public function error_400()
     {
         $this->response['status'] = "error";
@@ -38,6 +41,7 @@ class respuestas
         return $this->response;
     }
 
+    //<!-- ========== METODO DE RESPUESTA A ERROR EN SERVIDOR O MAL SENTENCIA SQL  ========== -->
     public function error_500($valor = "Error interno del servidor")
     {
         $this->response['status'] = "error";
@@ -48,6 +52,7 @@ class respuestas
         return $this->response;
     }
 
+    //<!-- ========== METODO DE RESPUESTA A LA NO UTILIZACION DEL TOKEN  ========== -->
     public function error_401($valor = "No autorizado")
     {
         $this->response['status'] = "error";

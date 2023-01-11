@@ -7,10 +7,10 @@ class conexionBd extends PDO
     private $password;
     private $database;
     private $port;
-    private $conexion;
 
     function __construct()
     {
+        //<!-- ========== ASIGNAR DATOS OBTENIDOS A CADA VARIABLE ========== -->
         $listaDatos = $this->datosConexion();
         foreach ($listaDatos as $key => $value) {
             $this->server = $value["server"];
@@ -20,6 +20,7 @@ class conexionBd extends PDO
             $this->port = $value["port"];
         }
 
+        //<!-- ========== CONEXION A LA BD POR MEDIO DE PDO ========== -->
         try {
             parent::__construct(
                 "mysql:host={$this->server};dbname={$this->database};port={$this->port}",
@@ -35,6 +36,7 @@ class conexionBd extends PDO
         }
     }
 
+    //<!-- ========== METODO DE OBTENCION DE CREDENCIALES DEL ARCHIVO CONFIG ========== -->
     private function datosConexion()
     {
         $direccion = dirname(__FILE__);
@@ -42,6 +44,7 @@ class conexionBd extends PDO
         return json_decode($jsonData, true);
     }
 
+    //<!-- ========== METODO PARA CONVERTIR A UTF8 ========== -->
     public function convertirUtf8($array)
     {
         array_walk_recursive($array, function (&$item, $key) {
@@ -52,35 +55,7 @@ class conexionBd extends PDO
         return $array;
     }
 
-    public function obtenerDatos($sqlStr)
-    {
-        $resultados = $this->conexion->query($sqlStr);
-        $resultArray = array();
-
-        foreach ($resultados as $key) {
-            $resultArray[] = $key;
-        }
-        return $this->convertirUtf8($resultArray);
-    }
-
-    /*public function nonQuery($sqlStr)
-    {
-        $resultados = $this->conexion->exec($sqlStr);
-        return $resultados;
-    }
-
-    //INSERT
-    public function nonQueryId($sqlStr)
-    {
-        $resultados = $this->conexion->exec($sqlStr);
-
-        if ($resultados >= 1) {
-            return $this->conexion->lastInsertId();
-        } else {
-            return 0;
-        }
-    }*/
-
+    //<!-- ========== METODO PARA ENCRIPTAR CONTRASEÑA DIGITADA A MD5 ========== -->
     //ENCRIPTAR
     protected function encriptar($string){
         return md5($string);
